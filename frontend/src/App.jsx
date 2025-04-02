@@ -46,21 +46,25 @@ const App = () => {
 
   const BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5000/api' : '/api';
 
-  const handleCaptureScreenshot = () => {
+  const handleCaptureScreenshot = async () => {
     console.log(BASE_URL);
-    setLoading(true);
-    axios.get(`${BASE_URL}/screenshot`, {
-      params: { url: window.location.href },
-      responseType: "blob",
-    })
-      .then((response) => {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(response.data);
-        link.download = "screenshot.png";
-        link.click();
-      })
-      .catch((error) => console.error("Error downloading screenshot:", error))
-      .finally(() => setLoading(false));
+    try {
+      setLoading(true);
+      const response = await axios.get(`${BASE_URL}/screenshot`, {
+        params: { url: window.location.href },
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], { type: "image/png" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "screenshot.png";
+      link.click();
+    } catch (error) {
+      console.error("Error downloading screenshot:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
 
