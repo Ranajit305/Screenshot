@@ -47,26 +47,33 @@ const Screenshot = () => {
     const BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5000' : "https://screenshot-production-2926.up.railway.app";
 
     const handleCaptureScreenshot = async () => {
-        console.log(BASE_URL);
+        if (loading) return; // Prevent duplicate clicks
+        setLoading(true);
+
         try {
-            setLoading(true);
+            console.log(BASE_URL);
             const response = await axios.get(`${BASE_URL}/screenshot`, {
                 params: { url: window.location.href },
                 responseType: "blob",
             });
 
-            const blob = new Blob([response.data], { type: "image/png" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "screenshot.png";
-            link.click();
+            if (response.status === 200) {
+                const blob = new Blob([response.data], { type: "image/png" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "screenshot.png";
+                link.click();
+            } else {
+                console.error("Screenshot failed:", response);
+            }
         } catch (error) {
-            console.error("Error downloading screenshot:", error.response.data.message);
+            console.error("Error downloading screenshot:", error);
         } finally {
             setLoading(false);
         }
-    }
-    
+    };
+
+
     return (
         <div className="min-h-screen bg-slate-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto bg-blue-100 rounded-xl shadow-lg overflow-hidden p-8">
