@@ -44,7 +44,7 @@ const Screenshot = () => {
         }
     ];
 
-    const BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5000' : `https://screenshot-3w5q.onrender.com`;
+    const BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5000' : "/";
 
     const handleCaptureScreenshot = async () => {
         console.log(BASE_URL);
