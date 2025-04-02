@@ -3,9 +3,7 @@ import { chromium } from "playwright";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
-import dotenv from "dotenv/config";
-
-dotenv.config();
+import "dotenv/config";
 
 const app = express();
 app.use(cors());
