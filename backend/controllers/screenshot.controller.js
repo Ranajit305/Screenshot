@@ -1,6 +1,6 @@
+import puppeteer from "puppeteer";
 import path from "path";
 import fs from "fs";
-import puppeteer from "puppeteer";
 
 export const captureScreenshot = async (req, res) => {
     const url = req.query.url;
@@ -8,33 +8,66 @@ export const captureScreenshot = async (req, res) => {
         return res.status(400).json({ error: "URL is required" });
     }
 
+    // Validate URL format
     try {
-        const browser = await puppeteer.launch({
+        new URL(url);
+    } catch (err) {
+        return res.status(400).json({ error: "Invalid URL format" });
+    }
+
+    let browser;
+    try {
+        browser = await puppeteer.launch({
             headless: "new",
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            args: [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",  // Important for Render.com
+                "--single-process"          // May help in memory-constrained environments
+            ],
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH // For Render.com
         });
 
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: "networkidle2" });
+        await page.setViewport({ width: 1280, height: 800 });
 
-        const screenshotPath = path.join(process.cwd(), "screenshot.png");
-        await page.screenshot({ path: screenshotPath, fullPage: true });
-
-        await browser.close();
-
-        res.download(screenshotPath, "screenshot.png", (err) => {
-            if (err) {
-                console.error("Download error:", err);
-            } else {
-                setTimeout(() => {
-                    fs.unlink(screenshotPath, (unlinkErr) => {
-                        if (unlinkErr) console.error("Error deleting file:", unlinkErr);
-                    });
-                }, 5000); // Delete file after 5 seconds
-            }
+        // Increased timeout and added error handling for navigation
+        await page.goto(url, {
+            waitUntil: "networkidle2",
+            timeout: 60000  // 60 seconds timeout
         });
+
+        // Generate unique filename to prevent conflicts
+        const timestamp = Date.now();
+        const screenshotPath = path.join("/tmp", `screenshot-${timestamp}.png`);  // Using /tmp directory
+
+        await page.screenshot({
+            path: screenshotPath,
+            fullPage: true,
+            type: "png"
+        });
+
+        // Stream the file instead of using res.download
+        res.setHeader("Content-Type", "image/png");
+        res.setHeader("Content-Disposition", `attachment; filename="screenshot-${timestamp}.png"`);
+
+        const fileStream = fs.createReadStream(screenshotPath);
+        fileStream.pipe(res);
+
+        fileStream.on("end", () => {
+            // Delete file after streaming completes
+            fs.unlink(screenshotPath, (err) => {
+                if (err) console.error("Error deleting screenshot:", err);
+            });
+        });
+
     } catch (error) {
         console.error("Error capturing screenshot:", error);
-        res.status(500).json({ error: "Failed to capture screenshot" });
+        res.status(500).json({
+            error: "Failed to capture screenshot",
+            details: error.message
+        });
+    } finally {
+        if (browser) await browser.close();
     }
 };
