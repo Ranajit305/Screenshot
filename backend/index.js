@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
+const __dirname = path.resolve();
 
 app.get("/screenshot", async (req, res) => {
     const url = req.query.url;
@@ -20,7 +21,11 @@ app.get("/screenshot", async (req, res) => {
     }
 
     try {
-        const browser = await chromium.launch({ headless: true });
+        const browser = await chromium.launch({
+            headless: true,
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        });
+
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: "networkidle" });
 
@@ -30,20 +35,26 @@ app.get("/screenshot", async (req, res) => {
         await browser.close();
 
         res.download(screenshotPath, "screenshot.png", (err) => {
-            if (err) console.error("Download error:", err);
-            fs.unlink(screenshotPath, (unlinkErr) => {
-                if (unlinkErr) console.error("Error deleting file:", unlinkErr);
-            });
+            if (err) {
+                console.error("Download error:", err);
+            } else {
+                fs.unlink(screenshotPath, (unlinkErr) => {
+                    if (unlinkErr) console.error("Error deleting file:", unlinkErr);
+                });
+            }
         });
     } catch (error) {
         console.error("Error capturing screenshot:", error);
-        res.status(500).json({ success: false ,error: error.message});
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
-app.get('/', (req, res) => {
-    res.send('API Working');
-})
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    })
+}
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
