@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import path from 'path';
+import 'dotenv/config'
 
 import screenshotRouter from './routes/screenshot.route.js'
 
@@ -19,6 +20,6 @@ if (process.env.NODE === 'production') {
     })
 }
 
-const PORT = 5000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
