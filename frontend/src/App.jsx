@@ -48,19 +48,19 @@ const App = () => {
 
   const handleCaptureScreenshot = () => {
     console.log(BASE_URL);
-    setLoading(true);
-    axios.get(`${BASE_URL}/screenshot`, {
-      params: { url: window.location.href },
-      responseType: "blob",
-    })
-      .then((response) => {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(response.data);
-        link.download = "screenshot.png";
-        link.click();
-      })
-      .catch((error) => console.error("Error downloading screenshot:", error))
-      .finally(() => setLoading(false));
+    // setLoading(true);
+    // axios.get(`${BASE_URL}/screenshot`, {
+    //   params: { url: window.location.href },
+    //   responseType: "blob",
+    // })
+    //   .then((response) => {
+    //     const link = document.createElement("a");
+    //     link.href = URL.createObjectURL(response.data);
+    //     link.download = "screenshot.png";
+    //     link.click();
+    //   })
+    //   .catch((error) => console.error("Error downloading screenshot:", error))
+    //   .finally(() => setLoading(false));
   }
 
 
