@@ -61,7 +61,7 @@ const App = () => {
       link.download = "screenshot.png";
       link.click();
     } catch (error) {
-      console.error("Error downloading screenshot:", error);
+      console.error("Error downloading screenshot:", error.response.data.message);
     } finally {
       setLoading(false);
     }

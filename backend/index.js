@@ -37,7 +37,7 @@ app.get("/screenshot", async (req, res) => {
         });
     } catch (error) {
         console.error("Error capturing screenshot:", error);
-        res.status(500).json({ error: "Failed to capture screenshot" });
+        res.status(500).json({ success: false ,error: error.message});
     }
 });
 
