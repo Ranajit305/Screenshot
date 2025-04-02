@@ -47,6 +47,7 @@ const App = () => {
   const BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5000/api' : '/api';
 
   const handleCaptureScreenshot = () => {
+    console.log(BASE_URL);
     setLoading(true);
     axios.get(`${BASE_URL}/screenshot`, {
       params: { url: window.location.href },
