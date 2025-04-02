@@ -139,7 +139,7 @@ const Screenshot = () => {
                 </div>
             </div>
             <button
-                onClick={handleCaptureScreenshot}
+                onClick={() => handleCaptureScreenshot}
                 disabled={loading}
                 className={`fixed bottom-4 right-4 flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg transition ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
                     }`}
