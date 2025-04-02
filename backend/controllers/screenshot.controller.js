@@ -1,6 +1,6 @@
-import puppeteer from "puppeteer";
 import path from "path";
 import fs from "fs";
+import puppeteer from "puppeteer";
 
 export const captureScreenshot = async (req, res) => {
     const url = req.query.url;
@@ -9,7 +9,11 @@ export const captureScreenshot = async (req, res) => {
     }
 
     try {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless: "new",
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        });
+
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: "networkidle2" });
 
@@ -19,8 +23,15 @@ export const captureScreenshot = async (req, res) => {
         await browser.close();
 
         res.download(screenshotPath, "screenshot.png", (err) => {
-            if (err) console.error("Download error:", err);
-            fs.unlinkSync(screenshotPath);
+            if (err) {
+                console.error("Download error:", err);
+            } else {
+                setTimeout(() => {
+                    fs.unlink(screenshotPath, (unlinkErr) => {
+                        if (unlinkErr) console.error("Error deleting file:", unlinkErr);
+                    });
+                }, 5000); // Delete file after 5 seconds
+            }
         });
     } catch (error) {
         console.error("Error capturing screenshot:", error);
