@@ -67,7 +67,6 @@ const App = () => {
     }
   }
 
-
   return (
     <div className="min-h-screen bg-slate-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-blue-100 rounded-xl shadow-lg overflow-hidden p-8">
