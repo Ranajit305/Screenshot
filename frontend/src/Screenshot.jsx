@@ -140,7 +140,7 @@ const Screenshot = () => {
             <button
                 onClick={() => handleCaptureScreenshot()}
                 disabled={loading}
-                className={`fixed bottom-4 right-4 flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg transition ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
+                className={`fixed cursor-pointer bottom-4 right-4 flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg transition ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
                     }`}
             >
                 <Camera className="w-5 h-5" /> {loading ? "Processing..." : "Take Screenshot"}
