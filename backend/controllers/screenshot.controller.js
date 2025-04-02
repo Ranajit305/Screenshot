@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 
 export const captureScreenshot = async (req, res) => {
-    const url = req.query.url;
+    const url = req.params.url;
     if (!url) {
         return res.status(400).json({ error: "URL is required" });
     }
